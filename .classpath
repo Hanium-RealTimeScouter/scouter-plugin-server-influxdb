@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="target/lib/converter-moshi-2.1.0.jar"/>
+	<classpathentry kind="lib" path="target/lib/guava-19.0.jar"/>
+	<classpathentry kind="lib" path="target/lib/influxdb-java-2.4.jar"/>
+	<classpathentry kind="lib" path="target/lib/logging-interceptor-3.4.1.jar"/>
+	<classpathentry kind="lib" path="target/lib/moshi-1.2.0.jar"/>
+	<classpathentry kind="lib" path="target/lib/okhttp-3.4.1.jar"/>
+	<classpathentry kind="lib" path="target/lib/okio-1.9.0.jar"/>
+	<classpathentry kind="lib" path="target/lib/retrofit-2.1.0.jar"/>
+	<classpathentry kind="lib" path="target/lib/scouter-common-1.1.1.jar"/>
+	<classpathentry kind="lib" path="target/lib/scouter-server-1.1.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
