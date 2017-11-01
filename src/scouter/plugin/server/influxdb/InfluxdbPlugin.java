@@ -18,27 +18,41 @@ import scouter.util.HashUtil;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Gun Lee (gunlee01@gmail.com) on 2016. 3. 29.
- */
 public class InfluxdbPlugin {
     Configure conf = Configure.getInstance();
 
+    //Default Configuration (conf/scouter.conf)
+    //plugin 사용 여부 (def : true)
     private static final String ext_plugin_influxdb_enabled = "ext_plugin_influxdb_enabled";
+    //influxdb measurement명 (def : counter)
     private static final String ext_plugin_influxdb_measurement = "ext_plugin_influxdb_measurement";
 
+    /*UDP Configuration*/
+    //UDP Protocol로 Influxdb와 연동 (def : true)
     private static final String ext_plugin_influxdb_udp = "ext_plugin_influxdb_udp";
+    //UDP Local ip address (def : null)
     private static final String ext_plugin_influxdb_udp_local_ip = "ext_plugin_influxdb_udp_local_ip";
+    //UDP Local port number (def : 0)
     private static final String ext_plugin_influxdb_udp_local_port = "ext_plugin_influxdb_udp_local_port";
-
+    //UDP Target ip address (def : 127.0.0.1)
     private static final String ext_plugin_influxdb_udp_target_ip = "ext_plugin_influxdb_udp_target_ip";
+    //UDP Target port number (def : 8089)
     private static final String ext_plugin_influxdb_udp_target_port = "ext_plugin_influxdb_udp_target_port";
 
+    /*HTTP Configuration*/
+    //HTTP Target(Influxdb) ip address (def : 127.0.0.1)
     private static final String ext_plugin_influxdb_http_target_ip = "ext_plugin_influxdb_http_target_ip";
+    //HTTP Target port number (def : 8086)
     private static final String ext_plugin_influxdb_http_target_port = "ext_plugin_influxdb_http_target_port";
+    //HTTP Retention policy (def : default)
     private static final String ext_plugin_influxdb_http_retention_policy = "ext_plugin_influxdb_http_retention_policy";
+    
+    /*Account Configuration*/
+    //ID (def : root)
     private static final String ext_plugin_influxdb_id = "ext_plugin_influxdb_id";
+    //Password (def : root)
     private static final String ext_plugin_influxdb_password = "ext_plugin_influxdb_password";
+    //Influxdb dbName(def : scouterCounter)
     private static final String ext_plugin_influxdb_dbName = "ext_plugin_influxdb_dbName";
 
     private static final String tagObjName = "obj";
@@ -64,7 +78,8 @@ public class InfluxdbPlugin {
     String id = conf.getValue(ext_plugin_influxdb_id, "root");
     String password = conf.getValue(ext_plugin_influxdb_password, "root");
     String dbName = conf.getValue(ext_plugin_influxdb_dbName, "scouterCounter");
-
+    
+    
     InfluxDB influx = null;
 
     public InfluxdbPlugin() {
@@ -136,7 +151,8 @@ public class InfluxdbPlugin {
     }
 
     @ServerPlugin(PluginConstants.PLUGIN_SERVER_COUNTER)
-    public void counter(final PerfCounterPack pack) {
+    public void counter(PerfCounterPack pack) {
+    	
         if (!enabled) {
             return;
         }
@@ -146,6 +162,7 @@ public class InfluxdbPlugin {
         }
 
         try {
+        	
             String objName = pack.objName;
             int objHash = HashUtil.hash(objName);
             String objType = AgentManager.getAgent(objHash).objType;
@@ -157,6 +174,7 @@ public class InfluxdbPlugin {
                     .tag(tagObjFamily, objFamily);
 
             Map<String, Value> dataMap = pack.data.toMap();
+            
             for (Map.Entry<String, Value> field : dataMap.entrySet()) {
                 Value valueOrigin = field.getValue();
                 if (valueOrigin == null) {
@@ -172,22 +190,27 @@ public class InfluxdbPlugin {
                 }
                 builder.addField(key, (Number)value);
             }
+            
             Point point = builder.build();
 
             if (isUdp) {
                 String line = point.lineProtocol();
                 udpAgent.write(line);
-                System.out.println(line);
+                //System.out.println(line);
             } else { // http
                 influx.write(dbName, retentionPolicy, point);
             }
 
         } catch (Exception e) {
+        	
+        	e.printStackTrace(Logger.pw());
             if (conf._trace) {
                 Logger.printStackTrace("IFLX001", e);
             } else {
                 Logger.println("IFLX002", e.getMessage());
             }
         }
+        
     }
 }
+
